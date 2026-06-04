@@ -15,7 +15,7 @@ module "security" {
 module "k3s_node" {
   source            = "./modules/ec2"
   instance_name     = "opspilot-k3s"
-  instance_type     = "t3.micro"
+  instance_type     = "m7i-flex.large"
   subnet_id         = module.vpc.public_subnet_id
   security_group_id = module.security.ec2_sg_id
   key_name          = aws_key_pair.opspilot.key_name
@@ -24,7 +24,7 @@ module "k3s_node" {
 module "monitoring_node" {
   source            = "./modules/ec2"
   instance_name     = "opspilot-monitoring"
-  instance_type     = "t3.micro"
+  instance_type     = "m7i-flex.large"
   subnet_id         = module.vpc.public_subnet_id
   security_group_id = module.security.ec2_sg_id
   key_name          = aws_key_pair.opspilot.key_name
