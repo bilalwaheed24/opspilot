@@ -4,13 +4,36 @@
 
 [![CI/CD Pipeline](https://github.com/bilalwaheed24/opspilot/actions/workflows/ci.yml/badge.svg)](https://github.com/bilalwaheed24/opspilot/actions/workflows/ci.yml)
 
+---
+
 ## Live Demo
-- Frontend: http://34.195.93.217:30080
-- Grafana: http://52.21.247.234:30091
 
-## Architecture
+- **Frontend:** http://34.195.93.217:30080
+- **Grafana:** http://52.21.247.234:30091
 
-![Architecture](docs/architecture.png)
+---
+
+## Screenshots
+
+### OpsPilot — Live Application on K3s
+![OpsPilot UI Live](docs/screenshots/01-opspilot-ui-live.png)
+
+### Kubernetes Cluster — All Pods Running
+![kubectl pods running](docs/screenshots/02-kubectl-pods-running.png)
+
+### CI/CD Pipeline — All Stages Green
+![GitHub Actions green](docs/screenshots/09-github-actions-all-green.png)
+
+### Deploy to K3s — Successful Rollout
+![Deploy to K3s](docs/screenshots/10-github-actions-deploy-k3s.png)
+
+### Grafana Monitoring Dashboard
+![Grafana dashboard](docs/screenshots/05-grafana-dashboard-metrics.png)
+
+### Prometheus Metrics
+![Prometheus](docs/screenshots/07-prometheus-ui.png)
+
+---
 
 ## Tech Stack
 
@@ -19,73 +42,116 @@
 | Cloud | AWS EC2, VPC, EIP |
 | IaC | Terraform |
 | Containers | Docker, GHCR |
-| Orchestration | K3s Kubernetes |
+| Orchestration | K3s Kubernetes (2-node cluster) |
 | CI/CD | GitHub Actions |
 | GitOps | ArgoCD |
 | Monitoring | Prometheus, Grafana |
 | Security | OPA Gatekeeper, Trivy |
 
+---
+
 ## What This Demonstrates
 
 | Concern | Implementation |
 |---------|---------------|
-| IaC | Terraform modules, S3 state, DynamoDB lock |
-| Orchestration | K3s 2-node cluster, HPA, NetworkPolicies |
-| GitOps | ArgoCD automated sync, self-heal |
-| Security | OPA policies, Trivy CVE scanning |
-| Observability | Prometheus metrics, Grafana dashboards |
-| Cost | $0/month — free tier |
+| IaC | Terraform modules, S3 remote state, DynamoDB lock |
+| Orchestration | K3s 2-node cluster, resource limits, probes |
+| GitOps | ArgoCD automated sync, self-heal, prune |
+| Security | OPA policies block root containers, Trivy CVE scanning |
+| Observability | Prometheus scraping, Grafana dashboards, node metrics |
+| Cost | $0/month — 100% AWS Free Tier |
+
+---
 
 ## Services
 
 | Service | Stack | Port |
 |---------|-------|------|
-| Frontend | React + Nginx | 30080 |
-| API | Node.js + Express | 30081 |
-| Worker | Python | — |
+| Frontend | React + Vite + Nginx | 30080 |
+| API | Node.js + Express + prom-client | 30081 |
+| Worker | Python (background processor) | — |
+| Prometheus | prom/prometheus | 30093 |
+| Grafana | grafana/grafana | 30091 |
+
+---
 
 ## CI/CD Pipeline
 
-Every `git push` to main:
-1. Lint + Unit Tests (Jest)
-2. Docker Build
-3. Trivy Security Scan
-4. Push to GHCR
-5. Deploy to K3s
+Every `git push` to `main` automatically:
+
+1. Lint (ESLint + flake8)
+2. Unit Tests (Jest — 4 tests, 72% coverage)
+3. Docker Build (multi-stage, non-root user)
+4. Trivy Security Scan (blocks on CRITICAL CVEs)
+5. Push to GHCR
+6. Deploy to K3s (kubectl rollout)
+7. Verify all pods Running
+
+**Total pipeline time: ~1m 37s**
+
+---
 
 ## Infrastructure
 
 ```bash
-# Provision everything
+# Provision entire AWS infrastructure
 cd infra && terraform apply
 
-# Deploy services
+# Deploy all services to K3s
 kubectl apply -k k8s/overlays/prod
+
+# Check status
+kubectl get pods
+kubectl get nodes
 ```
+
+---
 
 ## Cost Breakdown
 
-| Service | Free Tier | Cost |
-|---------|-----------|------|
-| 2x EC2 m7i-flex.large | Free tier | $0 |
-| S3 | 5GB free | $0 |
-| DynamoDB | 25GB free | $0 |
-| **Total** | | **$0** |
+| Service | Free Tier Limit | Cost |
+|---------|----------------|------|
+| 2x EC2 m7i-flex.large | Free tier eligible | $0 |
+| S3 (Terraform state) | 5GB free | $0 |
+| DynamoDB (state lock) | 25GB free | $0 |
+| GHCR (container registry) | Free for public repos | $0 |
+| GitHub Actions | 2000 min/month free | $0 |
+| **Total** | | **$0/month** |
+
+---
 
 ## Repository Structure
-opspilot/
-├── infra/          # Terraform IaC
-├── services/       # Microservices
-│   ├── api/        # Node.js API
-│   ├── worker/     # Python worker
-│   └── frontend/   # React UI
-├── k8s/            # Kubernetes manifests
-├── security/       # OPA policies
-└── .github/        # CI/CD workflows
 
+opspilot/
+├── .github/
+│   └── workflows/
+│       └── ci.yml          # CI/CD pipeline
+├── infra/                  # Terraform IaC
+│   ├── modules/
+│   │   ├── vpc/
+│   │   ├── ec2/
+│   │   └── security/
+│   └── environments/prod/
+├── services/               # Microservices
+│   ├── api/                # Node.js API
+│   ├── worker/             # Python worker
+│   └── frontend/           # React UI
+├── k8s/                    # Kubernetes manifests
+│   ├── base/
+│   └── overlays/prod/      # Kustomize (ArgoCD watches this)
+├── security/
+│   └── opa-policies/       # OPA Gatekeeper constraints
+├── docs/
+│   └── screenshots/        # Proof of work
+└── README.md
+
+---
 
 ## Author
 
-Bilal Waheed — Junior DevOps Engineer
-- GitHub: github.com/bilalwaheed24
+**Bilal Waheed** — Junior DevOps Engineer
+
+- GitHub: [github.com/bilalwaheed24](https://github.com/bilalwaheed24)
 - Email: thebilalwaheed@gmail.com
+- LinkedIn: [linkedin.com/in/bilalwaheed](https://linkedin.com/in/bilalwaheed)
+
