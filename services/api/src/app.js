@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const client = require('prom-client');
 const winston = require('winston');
 
@@ -24,6 +25,7 @@ const tasksCreatedTotal = new client.Counter({
 });
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
