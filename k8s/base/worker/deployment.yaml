@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+      - name: worker
+        image: ghcr.io/bilalwaheed24/opspilot-worker:latest
+        resources:
+          requests:
+            cpu: "30m"
+            memory: "60Mi"
+          limits:
+            cpu: "100m"
+            memory: "100Mi"
