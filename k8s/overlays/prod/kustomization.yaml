@@ -8,8 +8,8 @@ resources:
 
 images:
   - name: ghcr.io/bilalwaheed24/opspilot-api
-    newTag: latest
+    newTag: latest  # api
   - name: ghcr.io/bilalwaheed24/opspilot-worker
-    newTag: latest
+    newTag: latest  # worker
   - name: ghcr.io/bilalwaheed24/opspilot-frontend
-    newTag: latest
+    newTag: latest  # frontend
