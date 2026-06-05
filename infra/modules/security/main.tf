@@ -72,6 +72,14 @@ ingress {
   to_port     = 3000
   protocol    = "tcp"
   cidr_blocks = ["0.0.0.0/0"]
-}   
+} 
+  
+ingress {
+  description = "Monitoring ports"
+  from_port   = 30091
+  to_port     = 30093
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
 
 }
