@@ -122,28 +122,66 @@ kubectl get nodes
 
 ## Repository Structure
 
+```
 opspilot/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml          # CI/CD pipeline
-├── infra/                  # Terraform IaC
-│   ├── modules/
-│   │   ├── vpc/
-│   │   ├── ec2/
-│   │   └── security/
-│   └── environments/prod/
-├── services/               # Microservices
-│   ├── api/                # Node.js API
-│   ├── worker/             # Python worker
-│   └── frontend/           # React UI
-├── k8s/                    # Kubernetes manifests
-│   ├── base/
-│   └── overlays/prod/      # Kustomize (ArgoCD watches this)
-├── security/
-│   └── opa-policies/       # OPA Gatekeeper constraints
+│       └── ci.yml                  # CI/CD pipeline
 ├── docs/
-│   └── screenshots/        # Proof of work
+│   ├── adr/                        # Architecture Decision Records
+│   ├── runbooks/                   # Operational runbooks
+│   └── screenshots/                # Proof-of-work images
+├── infra/                          # Terraform IaC (AWS)
+│   ├── bootstrap/                  # S3 + DynamoDB state backend
+│   ├── modules/
+│   │   ├── ec2/
+│   │   ├── security/
+│   │   └── vpc/
+│   ├── backend.tf
+│   ├── main.tf
+│   └── providers.tf
+├── k8s/                            # Kubernetes manifests (Kustomize)
+│   ├── argocd-app.yaml             # ArgoCD Application definition
+│   ├── base/
+│   │   ├── api/
+│   │   ├── frontend/
+│   │   ├── monitoring/             # Prometheus + Grafana + node-exporter
+│   │   ├── networkpolicies/
+│   │   └── worker/
+│   └── overlays/
+│       └── prod/                   # ArgoCD watches this path
+├── monitoring/                     # Raw configs (mounted as ConfigMaps)
+│   ├── alertmanager/
+│   ├── grafana/
+│   └── prometheus/
+├── security/
+│   └── opa-policies/               # OPA Gatekeeper constraints
+│       ├── deny-latest-tag.yaml
+│       └── require-non-root.yaml
+├── services/
+│   ├── docker-compose.yml
+│   ├── api/                        # Node.js + Express
+│   │   ├── src/app.js
+│   │   ├── tests/app.test.js
+│   │   ├── Dockerfile
+│   │   └── package.json
+│   ├── frontend/                   # React + Vite + Nginx
+│   │   ├── src/
+│   │   │   ├── App.jsx
+│   │   │   ├── App.css
+│   │   │   ├── index.css
+│   │   │   └── main.jsx
+│   │   ├── public/
+│   │   ├── Dockerfile
+│   │   ├── nginx.conf
+│   │   └── vite.config.js
+│   └── worker/                     # Python background processor
+│       ├── src/worker.py
+│       ├── Dockerfile
+│       └── requirements.txt
+├── .gitignore
 └── README.md
+```
 
 ---
 

@@ -5,3 +5,13 @@
 **/.terraform/
 *.tfvars
 .terraform.lock.hcl
+
+# Build artifacts
+node_modules/
+coverage/
+*.lcov
+
+# Editor / OS
+.DS_Store
+*.swp
+*.swo

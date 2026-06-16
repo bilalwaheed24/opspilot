@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const API = "http://34.195.93.217:8080";
+const API = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
